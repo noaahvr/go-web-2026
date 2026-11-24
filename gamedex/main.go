@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
 	"strconv"
 )
 
@@ -48,7 +49,7 @@ const pageAccueil = `<!DOCTYPE html>
 <body>
   <main>
     <h1>Game<span>Dex</span></h1>
-    <p>Par Noah VIEIRA ROSA</p>
+    <p>Le catalogue de jeux vidéo et de leurs tournois.</p>
     <p><a class="bouton" href="/jeux">Voir les jeux</a></p>
   </main>
 </body>
@@ -86,9 +87,41 @@ func detailJeu(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, "Jeu n°%d : %s\n", jeu.ID, jeu.Nom)
 }
 
+func afficherCatalogue() error {
+	games, err := FetchGames()
+	if err != nil {
+		return err
+	}
+	tournaments, err := FetchTournaments()
+	if err != nil {
+		return err
+	}
+
+	parJeu := make(map[int]int)
+	for _, t := range tournaments {
+		parJeu[t.GameID]++
+	}
+
+	fmt.Printf("%d jeux dans le catalogue :\n", len(games))
+	for _, g := range games {
+		n := parJeu[g.ID]
+		mot := "tournoi"
+		if n > 1 {
+			mot = "tournois"
+		}
+		fmt.Printf("- %s (%d) : %d %s\n", g.Name, g.Year, n, mot)
+	}
+	return nil
+}
+
 func main() {
 	port := flag.Int("port", 8080, "port d'écoute du serveur")
 	flag.Parse()
+
+	if err := afficherCatalogue(); err != nil {
+		fmt.Fprintln(os.Stderr, "Erreur :", err)
+		os.Exit(1)
+	}
 
 	mux := http.NewServeMux()
 
