@@ -1,4 +1,4 @@
-package main
+package api
 
 import (
 	"encoding/json"
@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"net"
 	"net/http"
-	"strconv"
 	"time"
 )
 
@@ -30,11 +29,6 @@ type Tournament struct {
 	Lng    float64 `json:"lng"`
 }
 
-var (
-	ErrNotFound = errors.New("introuvable sur l'API")
-	ErrTimeout  = errors.New("l'API n'a pas répondu à temps")
-)
-
 var client = &http.Client{Timeout: 3 * time.Second}
 
 func FetchGames() ([]Game, error) {
@@ -53,22 +47,6 @@ func FetchTournaments() ([]Tournament, error) {
 	return tournaments, nil
 }
 
-func FetchGame(id int) (Game, error) {
-	var game Game
-	if err := getJSON("/games/"+strconv.Itoa(id), &game); err != nil {
-		return Game{}, fmt.Errorf("récupération du jeu %d : %w", id, err)
-	}
-	return game, nil
-}
-
-func FetchGameTournaments(id int) ([]Tournament, error) {
-	var tournaments []Tournament
-	if err := getJSON("/games/"+strconv.Itoa(id)+"/tournaments", &tournaments); err != nil {
-		return nil, fmt.Errorf("récupération des tournois du jeu %d : %w", id, err)
-	}
-	return tournaments, nil
-}
-
 func getJSON(chemin string, cible any) error {
 	adresse := apiBase + chemin
 
@@ -76,7 +54,7 @@ func getJSON(chemin string, cible any) error {
 	if err != nil {
 		var netErr net.Error
 		if errors.As(err, &netErr) && netErr.Timeout() {
-			return fmt.Errorf("GET %s : %w (limite : %s)", adresse, ErrTimeout, client.Timeout)
+			return fmt.Errorf("l'API n'a pas répondu en moins de %s (%s)", client.Timeout, adresse)
 		}
 		return fmt.Errorf("impossible de joindre l'API (est-elle lancée avec « go run ./api » ?) : %w", err)
 	}
@@ -89,9 +67,6 @@ func getJSON(chemin string, cible any) error {
 		}
 		if json.NewDecoder(resp.Body).Decode(&apiErr) == nil && apiErr.Error != "" {
 			detail += " : " + apiErr.Error
-		}
-		if resp.StatusCode == http.StatusNotFound {
-			return fmt.Errorf("%w (%s)", ErrNotFound, detail)
 		}
 		return fmt.Errorf("l'API a répondu %s", detail)
 	}
