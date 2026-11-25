@@ -1,0 +1,13 @@
+{{template "header.html" .}}
+    <h1>Les jeux</h1>
+    {{if .Q}}<p class="recherche">Vous avez cherché : <strong>{{.Q}}</strong></p>{{end}}
+    <p class="meta">{{len .Jeux}} jeux dans le catalogue</p>
+    <ul class="liste">
+      {{range .Jeux}}
+      <li>
+        <a href="/jeux/{{.ID}}">{{.Name}}</a>
+        <span class="meta">{{.Studio}} · {{.Year}}</span>
+      </li>
+      {{end}}
+    </ul>
+{{template "footer.html" .}}

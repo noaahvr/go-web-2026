@@ -1,0 +1,24 @@
+{{template "header.html" .}}
+    <p><a href="/jeux">← Tous les jeux</a></p>
+    <h1>{{.Jeu.Name}}</h1>
+    <p class="meta">{{.Jeu.Studio}} · {{.Jeu.Year}}</p>
+    <p>{{range .Jeu.Genres}}<span class="badge">{{.}}</span>{{end}}</p>
+
+    <h2>Tournois</h2>
+    {{if .Tournois}}
+    <div class="tableau">
+      <table>
+        <thead>
+          <tr><th>Nom</th><th>Ville</th><th>Date</th></tr>
+        </thead>
+        <tbody>
+          {{range .Tournois}}
+          <tr><td>{{.Name}}</td><td>{{.City}}</td><td>{{.Date}}</td></tr>
+          {{end}}
+        </tbody>
+      </table>
+    </div>
+    {{else}}
+    <p class="meta">Aucun tournoi prévu pour ce jeu.</p>
+    {{end}}
+{{template "footer.html" .}}
