@@ -200,3 +200,68 @@ th {
 .erreur p {
   margin: 0 0 1.5rem;
 }
+
+button.bouton {
+  background: transparent;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.bouton-petit {
+  padding: 0.3rem 0.9rem;
+  border-width: 1px;
+  font-size: 0.9rem;
+}
+
+.filtres {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.6rem;
+  margin: 1rem 0;
+}
+
+.filtres input[type="search"] {
+  flex: 1 1 14rem;
+}
+
+input,
+select {
+  padding: 0.6rem 0.9rem;
+  border: 1px solid var(--bord);
+  border-radius: 0.6rem;
+  background: var(--carte);
+  color: var(--texte);
+  font: inherit;
+}
+
+input:focus-visible,
+select:focus-visible,
+button:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.vide {
+  padding: 1.5rem 0;
+  color: var(--discret);
+}
+
+.like {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin: 1.25rem 0 0;
+}
+
+.inscription {
+  display: flex;
+  gap: 0.4rem;
+}
+
+.inscription input {
+  width: 9rem;
+  padding: 0.3rem 0.6rem;
+  font-size: 0.9rem;
+}

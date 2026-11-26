@@ -4,16 +4,35 @@
     <p class="meta">{{.Jeu.Studio}} · {{.Jeu.Year}}</p>
     <p>{{range .Jeu.Genres}}<span class="badge">{{.}}</span>{{end}}</p>
 
-    <h2>Tournois</h2>
+    <form class="like" method="post" action="/jeux/{{.Jeu.ID}}/like">
+      <button class="bouton" type="submit">J'aime</button>
+      <span class="meta">{{.Likes}} j'aime</span>
+    </form>
+
+    <h2 id="tournois">Tournois</h2>
     {{if .Tournois}}
     <div class="tableau">
       <table>
         <thead>
-          <tr><th>Nom</th><th>Ville</th><th>Date</th></tr>
+          <tr><th>Nom</th><th>Ville</th><th>Date</th><th>Inscrits</th><th>Inscription</th></tr>
         </thead>
         <tbody>
           {{range .Tournois}}
-          <tr><td>{{.Name}}</td><td>{{.City}}</td><td>{{.Date}}</td></tr>
+          <tr>
+            <td>{{.Name}}</td>
+            <td>{{.City}}</td>
+            <td>{{.Date}}</td>
+            <td>
+              {{len .Inscrits}}
+              {{if .Inscrits}}<br><span class="meta">{{range $i, $pseudo := .Inscrits}}{{if $i}}, {{end}}{{$pseudo}}{{end}}</span>{{end}}
+            </td>
+            <td>
+              <form class="inscription" method="post" action="/tournois/{{.ID}}/inscription">
+                <input type="text" name="pseudo" placeholder="Votre pseudo" maxlength="20" required aria-label="Pseudo pour {{.Name}}">
+                <button class="bouton bouton-petit" type="submit">S'inscrire</button>
+              </form>
+            </td>
+          </tr>
           {{end}}
         </tbody>
       </table>

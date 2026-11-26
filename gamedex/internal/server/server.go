@@ -8,22 +8,27 @@ import (
 	"net/http"
 	"path/filepath"
 
+	"gamedex/internal/api"
 	"gamedex/internal/catalog"
 )
 
+type SearchFunc func(q, genre string) ([]api.Game, error)
+
 type Server struct {
 	catalog   *catalog.Catalog
+	search    SearchFunc
 	templates *template.Template
 	staticDir string
 }
 
-func New(cat *catalog.Catalog, webDir string) (*Server, error) {
+func New(cat *catalog.Catalog, search SearchFunc, webDir string) (*Server, error) {
 	tmpl, err := template.ParseGlob(filepath.Join(webDir, "templates", "*.html"))
 	if err != nil {
 		return nil, fmt.Errorf("chargement des templates : %w", err)
 	}
 	return &Server{
 		catalog:   cat,
+		search:    search,
 		templates: tmpl,
 		staticDir: filepath.Join(webDir, "static"),
 	}, nil
@@ -35,6 +40,8 @@ func (s *Server) Handler() http.Handler {
 	mux.HandleFunc("GET /{$}", s.accueil)
 	mux.HandleFunc("GET /jeux", s.listeJeux)
 	mux.HandleFunc("GET /jeux/{id}", s.ficheJeu)
+	mux.HandleFunc("POST /jeux/{id}/like", s.aimerJeu)
+	mux.HandleFunc("POST /tournois/{id}/inscription", s.inscrireTournoi)
 	mux.HandleFunc("GET /", s.pageIntrouvable)
 
 	fichiers := http.FileServer(http.Dir(s.staticDir))

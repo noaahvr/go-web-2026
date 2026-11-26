@@ -22,7 +22,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	srv, err := server.New(cat, "web")
+	srv, err := server.New(cat, api.FetchGames, "web")
 	if err != nil {
 		fmt.Fprintln(os.Stderr, "Erreur :", err, "(lancez GameDex depuis le dossier gamedex/)")
 		os.Exit(1)
@@ -34,7 +34,7 @@ func main() {
 }
 
 func chargerCatalogue() (*catalog.Catalog, error) {
-	games, err := api.FetchGames()
+	games, err := api.FetchGames("", "")
 	if err != nil {
 		return nil, err
 	}

@@ -1,13 +1,33 @@
 {{template "header.html" .}}
     <h1>Les jeux</h1>
+
+    <form class="filtres" method="get" action="/jeux">
+      <input type="search" name="q" value="{{.Q}}" placeholder="Rechercher un jeu…" aria-label="Rechercher un jeu">
+      <select name="genre" aria-label="Genre">
+        <option value="">Tous les genres</option>
+        {{range .Genres}}
+        <option value="{{.}}"{{if eq . $.Genre}} selected{{end}}>{{.}}</option>
+        {{end}}
+      </select>
+      <button class="bouton" type="submit">Filtrer</button>
+      {{if .Filtre}}<a href="/jeux">Réinitialiser</a>{{end}}
+    </form>
+
     {{if .Q}}<p class="recherche">Vous avez cherché : <strong>{{.Q}}</strong></p>{{end}}
-    <p class="meta">{{len .Jeux}} jeux dans le catalogue</p>
+
+    {{if .Jeux}}
+    <p class="meta">
+      {{if .Filtre}}{{len .Jeux}} résultat{{if gt (len .Jeux) 1}}s{{end}}{{else}}{{len .Jeux}} jeux dans le catalogue{{end}}
+    </p>
     <ul class="liste">
       {{range .Jeux}}
       <li>
         <a href="/jeux/{{.ID}}">{{.Name}}</a>
-        <span class="meta">{{.Studio}} · {{.Year}}</span>
+        <span class="meta">{{.Studio}} · {{.Year}} · {{.Likes}} j'aime</span>
       </li>
       {{end}}
     </ul>
+    {{else}}
+    <p class="vide">Aucun jeu ne correspond à votre recherche.</p>
+    {{end}}
 {{template "footer.html" .}}

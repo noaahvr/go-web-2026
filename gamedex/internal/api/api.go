@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"net"
 	"net/http"
+	"net/url"
 	"time"
 )
 
@@ -29,11 +30,26 @@ type Tournament struct {
 	Lng    float64 `json:"lng"`
 }
 
+var ErrTimeout = errors.New("l'API n'a pas répondu à temps")
+
 var client = &http.Client{Timeout: 3 * time.Second}
 
-func FetchGames() ([]Game, error) {
+func FetchGames(q, genre string) ([]Game, error) {
+	params := url.Values{}
+	if q != "" {
+		params.Set("q", q)
+	}
+	if genre != "" {
+		params.Set("genre", genre)
+	}
+
+	chemin := "/games"
+	if len(params) > 0 {
+		chemin += "?" + params.Encode()
+	}
+
 	var games []Game
-	if err := getJSON("/games", &games); err != nil {
+	if err := getJSON(chemin, &games); err != nil {
 		return nil, fmt.Errorf("récupération des jeux : %w", err)
 	}
 	return games, nil
@@ -54,7 +70,7 @@ func getJSON(chemin string, cible any) error {
 	if err != nil {
 		var netErr net.Error
 		if errors.As(err, &netErr) && netErr.Timeout() {
-			return fmt.Errorf("l'API n'a pas répondu en moins de %s (%s)", client.Timeout, adresse)
+			return fmt.Errorf("GET %s : %w (limite : %s)", adresse, ErrTimeout, client.Timeout)
 		}
 		return fmt.Errorf("impossible de joindre l'API (est-elle lancée avec « go run ./api » ?) : %w", err)
 	}
